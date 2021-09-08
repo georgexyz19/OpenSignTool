@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <_name>1 - Draw Border</_name>
+  <id>draw_border.com.gotrafficsign</id>
+  <dependency type="executable" location="extensions">inkex.py</dependency>
+  <dependency type="executable" location="extensions">simplestyle.py</dependency>
+
+  <param name="tab" type="notebook">
+    <page name="rect" _gui-text="Rectangle">
+      <param name="width" type="int" min="0" max="1000"  _gui-text="Width (inch):">48</param>
+      <param name="height" type="int" min="0" max="1000" _gui-text="Height (inch):">60</param>
+      <param name="radius" type="float" min="0" max="100" precision="3" _gui-text="Radius (inch):">3.00</param>
+      <param name="offset" type="float" min="0" max="100" precision="3" _gui-text="Offset (inch):">0.75</param>
+      <param name="bdwidth" type="float" min="0" max="100" precision="3" _gui-text="Border Width (inch):">1.25</param>
+    </page>
+    <page name="diamond" _gui-text="Diamond">
+      <param name="diamond_width" type="int" min="0" max="1000"  _gui-text="Side Width (inch):">36</param>
+      <param name="diamond_radius" type="float" min="0" max="100" precision="3" _gui-text="Radius (inch):">2.25</param>
+      <param name="diamond_offset" type="float" min="0" max="100" precision="3" _gui-text="Offset (inch):">0.5</param>
+      <param name="diamond_bdwidth" type="float" min="0" max="100" precision="3" _gui-text="Border Width (inch):">1.0</param>
+    </page>
+    <page name="bar" _gui-text="Place Bar">
+      <param name="bar_width" type="int" min="0" max="1000"  _gui-text="Bar Width (inch):">36</param>
+      <param name="bar_height" type="float" min="0" max="100" precision="3" _gui-text="Bar Height (inch):">1</param>
+    </page>
+    <page name="options" _gui-text="Options">
+      <param name="bDrawMark" type="boolean" _gui-text="Place drawing marks">false</param>
+      <param name="fStrokeWidth" type="float" min="0" max="100" precision="2" _gui-text="Stroke Width (pixel):">3.00</param>
+    </page>
+  </param>
+  <effect>
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu _name="SignTool"/>
+    </effects-menu>
+  </effect>
+
+  <script>
+    <command reldir="extensions" interpreter="python">draw_border.py</command>
+  </script>
+
+</inkscape-extension>

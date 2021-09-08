@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <_name>3 - Draw Arrowhead</_name>
+  <id>draw.arrowhead.com.gotrafficsign</id>
+  <dependency type="executable" location="extensions">inkex.py</dependency>
+  <dependency type="executable" location="extensions">simplestyle.py</dependency>
+
+  <param name="length" type="float" min="0" max="100" precision="1" _gui-text="Side Length (pixel):">8.0</param>
+  <param name="angle" type="float" min="0" max="100" precision="1" _gui-text="Angle (degree):">60.0</param>
+
+
+  <param name="type" type="optiongroup" _gui-text="Start/End/Both:">
+    <option value="start">Start</_item>
+    <option value="end">End</_item>
+    <option value="both">Both</_item>
+  </param>
+
+  <effect>
+    <object-type>all</object-type>
+    <effects-menu>
+        <submenu _name="SignTool">
+            <submenu _name="4 - Other Tools"/>
+        </submenu>
+    </effects-menu>
+  </effect>
+
+  <script>
+    <command reldir="extensions" interpreter="python">draw_arrowhead.py</command>
+  </script>
+
+</inkscape-extension>

@@ -1,0 +1,8 @@
+output/
+dist/
+__pycache__/
+*.pyc
+.vscode/
+.python-version
+venv/
+*.swp

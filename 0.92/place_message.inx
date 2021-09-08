@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <_name>3 - Place Message Line</_name>
+  <id>signtool.message.com.gotrafficsign</id>
+  <dependency type="executable" location="extensions">inkex.py</dependency>
+
+  <param name="message" type="string"  _gui-text="Sign Message: "></param>
+  <param name="fontsize" type="enum"  _gui-text="Font Size: ">
+    <item value="B">B</item>
+    <item value="C">C</item>
+    <item value="D">D</item>
+    <item value="E">E</item>
+    <item value="EM">EM</item>
+    <item value="F">F</item>
+  </param>
+  <param name="fontheight" type="float" min="0" max="100" precision="1" _gui-text="Font Height (inch): ">4</param>
+  <param name="dist_to_top" type="float" min="0" max="480" precision="1" _gui-text="Message Top to Border Top (inch): ">4</param>
+  <param name="bDrawBox" type="boolean" _gui-text="Draw Boxes Around Message">false</param>
+
+  <effect>
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu _name="SignTool"/>
+    </effects-menu>
+  </effect>
+
+  <script>
+    <command reldir="extensions" interpreter="python">place_message.py</command>
+  </script>
+
+</inkscape-extension>
