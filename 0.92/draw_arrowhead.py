@@ -1,29 +1,29 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
-# draw_arrowhead.py
-Draw arrowhead for the SignTool package
+# # draw_arrowhead.py
+# Draw arrowhead for the SignTool package
+#
+# Copyright (C) June 2018 George Zhang
+# This extension has a subtle bug which will draw an arrow triangle in a 
+# distorted shape.  The bug is not present in the 1.1 version becuase 
+# the 1.1 version is a totally new design.  (9/10/2021)
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Copyright (C) June 2018 George Zhang
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""
-'''
-This program create auxilary lines on a new layer. 
-'''
 
 
 import inkex
@@ -274,7 +274,8 @@ class SignTool_Arrowhead(inkex.Effect):
         for i in range(n):
             points.append( [ xi[i], yi[i] ] )
     else:
-        #inkex.errormsg(_('Error: Not enough nodes to gather coordinates.')) #fail silently and exit, rather than invoke an error console
+        #inkex.errormsg(_('Error: Not enough nodes to gather coordinates.')) 
+        # #fail silently and exit, rather than invoke an error console
         return [] #return a blank
         
     return points

@@ -18,5 +18,3 @@ the table. If you accidentally click the menu item and want to
 go back, you can either press `Ctrl + z` to cancel or delete 
 the layer with name `Layer arrows`.  
 
-
-
