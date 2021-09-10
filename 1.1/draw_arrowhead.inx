@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+    <_name>1 - Draw Arrowhead</_name>
+    <id>draw.arrowhead.com.gotrafficsign</id>
+
+    <param name="length" type="float" min="0" max="100" precision="1" _gui-text="Length (pixel):">15.0</param>
+    <param name="angle" type="float" min="0" max="100" precision="1" _gui-text="Angle (degrees):">60.0</param>
+
+    <param name="type" type="optiongroup" _gui-text="Start/End/Both:">
+        <option value="start">Start</option>
+        <option value="end">End</option>
+        <option value="both">Both</option>
+    </param>
+
+    <param name="style" type="optiongroup" _gui-text="Arrow Style:">
+        <option value="normal">Normal</option>
+        <option value="sharp">Sharp</option>
+    </param>
+
+    <effect>
+        <object-type>all</object-type>
+        <effects-menu>
+            <submenu _name="SignTool">
+                <submenu _name="4 - Other Tools"/>
+            </submenu>
+        </effects-menu>
+    </effect>
+
+    <script>
+        <command location="inx" interpreter="python">draw_arrowhead.py</command>
+    </script>
+
+</inkscape-extension>
+

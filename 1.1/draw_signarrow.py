@@ -26,7 +26,6 @@
 from inkex import EffectExtension, TextElement, Style, Path, PathElement, \
   Transform, Layer, NSS
 
-import sys
 import math
 
 
