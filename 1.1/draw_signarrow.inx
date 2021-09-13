@@ -7,7 +7,7 @@
     <effect>
         <object-type>all</object-type>
         <effects-menu>
-            <submenu _name="SignTool">
+            <submenu _name="OpenSignTool">
                 <submenu _name="4 - Other Tools"/>
             </submenu>
         </effects-menu>
