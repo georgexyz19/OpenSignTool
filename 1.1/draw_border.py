@@ -24,137 +24,59 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This program changes the page size and creates a border on new layer. 
 '''
 
-import simpletransform
-import simplestyle
 import math
-import sys
 import inkex
-
 from inkex import Rectangle, Layer, NSS
 from inkex import Circle, Line, Vector2d
+from inkex import Transform
 
-def draw_SVG_line(x1, y1, x2, y2, style, name, parent):
-    line_style = {'stroke': style['stroke_color'],
-                  'stroke-width': str(style['stroke_width']),
-                  'fill': style['fill']}
-    line_attribs = {'style': simplestyle.formatStyle(line_style),
-                    inkex.addNS('label', 'inkscape'): name,
-                    'd': 'M ' + str(x1) + ',' + str(y1) + ' L' +
-                    str(x2) + ',' + str(y2)}
-    elm = inkex.etree.SubElement(
-        parent, inkex.addNS('path', 'svg'), line_attribs)
-    return elm
+class DrawBorder(object):
+    """"contains drawing methods for both rect, diamond, and bar"""
+    def _draw_rect_ri(self, x, y, w, h, r, st):
+        elem = Rectangle()
 
+        if r == 0:
+            elem.update(**{'x': str(x), 'y': str(y), 
+                'width': str(w), 'height': str(h),})
+        else:
+            elem.update(**{
+                'x': str(x), 'y': str(y), 
+                'width': str(w), 'height': str(h),
+                'rx': str(r), 'ry': str(r) 
+                })
+        elem.set('style', st)
+        return elem
 
-def draw_SVG_circle(x, y, radius, style, name, parent):
-    circle_style = {'stroke': style['stroke_color'],
-                    'stroke-width': str(style['stroke_width']),
-                    'fill': style['fill']}
-    circle_attribs = {'style': simplestyle.formatStyle(circle_style),
-                      inkex.addNS('label', 'inkscape'): name,
-                      'cx': str(x), 'cy': str(y),
-                      'r': str(radius)}
-    elm = inkex.etree.SubElement(
-        parent, inkex.addNS('circle', 'svg'), circle_attribs)
-    return elm
+       # easier to write as a class method
+    def _draw_mark(self, center, radius, st):
+        marks = []
+        el = Circle.new(center=center, radius=radius)
+        el.style = st
+        marks.append(el)
 
+        start = center - Vector2d(radius, 0)
+        end = center + Vector2d(radius, 0)
+        el_line1 = Line.new(start=start, end=end)
+        el_line1.style = st
+        marks.append(el_line1)
 
-# def draw_mark(x, y, radius, style, name, parent):
-#     draw_SVG_circle(x, y, radius, style, name + 'circle', parent)
-#     draw_SVG_line(x - radius, y, x + radius, y, style, name + 'line1', parent)
-#     draw_SVG_line(x, y - radius, x, y + radius, style, name + 'line1', parent)
+        start = center - Vector2d(0, radius)
+        end = center + Vector2d(0, radius)
+        el_line2 = Line.new(start=start, end=end)
+        el_line2.style = st
+        marks.append(el_line2)
 
-# # draw four corner marks
-
-
-# def draw_corner_marks(width, height, ra, style_stars, layer_bk):
-#     draw_mark(ra, ra, 0.5 * ra, style_stars, 'mark1', layer_bk)
-#     draw_mark((width + 1) * ra, ra, 0.5 * ra, style_stars, 'mark2', layer_bk)
-#     draw_mark(ra, (height + 1) * ra, 0.5 * ra, style_stars, 'mark3', layer_bk)
-#     draw_mark((width + 1) * ra, (height + 1) * ra,
-#               0.5 * ra, style_stars, 'mark4', layer_bk)
-
-
-def draw_outside_marks(width, height, ra, style_stars, layer_bk):
-    draw_mark((width/2 + 1) * ra, -0.5 * ra, 0.5 *
-              ra, style_stars, 'outmark1', layer_bk)
-    draw_mark((width/2 + 1) * ra, (height + 2 + 0.5) * ra,
-              0.5 * ra, style_stars, 'outmark2', layer_bk)
-    draw_mark(-0.5 * ra, (height / 2 + 1) * ra, 0.5 *
-              ra, style_stars, 'outmark2', layer_bk)
-    draw_mark((width + 2 + 0.5) * ra, (height / 2 + 1) * ra,
-              0.5 * ra, style_stars, 'outmark2', layer_bk)
-
-# draw diamond border four corner marks
-
-
-def draw_diamond_corner_marks(width, height, ra, style_stars, layer_bk):
-    draw_mark(width / 2 * ra, ra, 0.5 * ra, style_stars, 'mark1', layer_bk)
-    draw_mark(width / 2 * ra, (height - 1) * ra,
-              0.5 * ra, style_stars, 'mark2', layer_bk)
-    draw_mark(ra, height / 2 * ra, 0.5 * ra, style_stars, 'mark3', layer_bk)
-    draw_mark((width - 1) * ra, height / 2 * ra,
-              0.5 * ra, style_stars, 'mark4', layer_bk)
-
-
-# draw an SVG rectangle with radius
-def draw_SVG_rect_ri(x, y, width, height, radius, style, name, parent):
-    line_style = {'stroke': style['stroke_color'],
-                  'stroke-width': str(style['stroke_width']),
-                  'fill': style['fill']}
-    rect_ri_attribs = {'style': simplestyle.formatStyle(line_style),
-                       'width': str(width), 'height': str(height),
-                       'rx': str(radius), 'ry': str(radius),
-                       'x': str(x), 'y': str(y),
-                       inkex.addNS('label', 'inkscape'): name}
-    elm = inkex.etree.SubElement(
-        parent, inkex.addNS('rect', 'svg'), rect_ri_attribs)
-    return elm
-
-
-def draw_SVG_rect(x, y, width, height, style, name, parent):
-    line_style = {'stroke': style['stroke_color'],
-                  'stroke-width': str(style['stroke_width']),
-                  'fill': style['fill']}
-    rect_ri_attribs = {'style': simplestyle.formatStyle(line_style),
-                       'width': str(width), 'height': str(height),
-                       'x': str(x), 'y': str(y),
-                       inkex.addNS('label', 'inkscape'): name}
-    elm = inkex.etree.SubElement(
-        parent, inkex.addNS('rect', 'svg'), rect_ri_attribs)
-    return elm
-
-
-
-
-
-
-
-
-
+        return marks
 
 
 # try to design it as unitless
-class RectBorder():
+class RectBorder(DrawBorder):
     def __init__(self, w, h, r, offset, bdwidth):
         self.w = w
         self.h = h
         self.r = r
         self.offset = offset
         self.bdwidth = bdwidth
-
-    def _draw_rect_ri(self, x, y, w, h, r, st):
-        elem = Rectangle()
-        elem.update(**{
-            'x': str(x), 
-            'y': str(y), 
-            'width': str(w), 
-            'height': str(h),
-            'rx': str(r), 
-            'ry': str(r) 
-        })
-        elem.set('style', st)
-        return elem
 
     def draw_borders(self, x, y, st):
         borders = []
@@ -178,41 +100,85 @@ class RectBorder():
 
         return borders
 
-    # much easier to write as a class method
-    def draw_mark(self, center, radius, st):
-        marks = []
-        el = Circle.new(center=center, radius=radius)
-        el.style = st
-        marks.append(el)
-
-        start = center - Vector2d(radius, 0)
-        end = center + Vector2d(radius, 0)
-        el_line1 = Line.new(start=start, end=end)
-        el_line1.style = st
-        marks.append(el_line1)
-
-        start = center - Vector2d(0, radius)
-        end = center + Vector2d(0, radius)
-        el_line2 = Line.new(start=start, end=end)
-        el_line2.style = st
-        marks.append(el_line2)
-
-        return marks
-
     def draw_corner_marks(self, x, y, radius, st):
-        mark1 = self.draw_mark(Vector2d(x, y), radius, st)
-        mark2 = self.draw_mark(Vector2d(x + self.w, y), radius, st)
-        mark3 = self.draw_mark(Vector2d(x + self.w, y + self.h), radius, st)
-        mark4 = self.draw_mark(Vector2d(x, y + self.h), radius, st)
+        mark1 = self._draw_mark(Vector2d(x, y), radius, st)
+        mark2 = self._draw_mark(Vector2d(x + self.w, y), radius, st)
+        mark3 = self._draw_mark(Vector2d(x + self.w, y + self.h), radius, st)
+        mark4 = self._draw_mark(Vector2d(x, y + self.h), radius, st)
 
         return mark1 + mark2 + mark3 + mark4
 
 
+class DiamondBorder(DrawBorder):
+    def __init__(self, w, r, offset, bdwidth):
+        self.w = w
+        self.h = w
+        self.r = r
+        self.offset = offset
+        self.bdwidth = bdwidth  # border width
+        
+    def draw_borders(self, x, y, st):  # x, y center of canvas
+        borders = []
+
+        a = x - self.w / 2
+        b = y - self.h / 2  
+        elem_outside = self._draw_rect_ri( a, b, 
+            self.w, self.h, 
+            self.r, st)
+        
+        trans_str = 'rotate(' + str(45) + ',' + \
+                str(x ) + ',' + str(y ) + ') '
+
+        tr =  Transform(trans_str)
+        elem_outside.transform = tr
+        borders.append(elem_outside)
+
+        if self.offset > 0:
+            elem_offset = self._draw_rect_ri(a + self.offset, 
+                b + self.offset, 
+                self.w - 2 * self.offset, 
+                self.h - 2 * self.offset, 
+                self.r - self.offset, st)
+            elem_offset.transform = tr 
+            borders.append(elem_offset)
+
+        elem_inside = self._draw_rect_ri(a + self.offset + self.bdwidth, 
+                a + self.offset + self.bdwidth, 
+                self.w - 2 * self.offset - 2 * self.bdwidth, 
+                self.h - 2 * self.offset -  2 * self.bdwidth, 
+                self.r - self.offset - self.bdwidth, st)
+        elem_inside.transform = tr 
+
+        borders.append(elem_inside)  # code is similar to rect, how to unit two?
+
+        return borders        
+
+    def draw_corner_marks(self, x, y, side_dist, radius, st): # x, y center of canvas    
+
+        mark1 = self._draw_mark(Vector2d(x, side_dist), radius, st)
+        mark2 = self._draw_mark(Vector2d(side_dist, y), radius, st)
+        mark3 = self._draw_mark(Vector2d(x * 2 - side_dist, y), radius, st)
+        mark4 = self._draw_mark(Vector2d(x, y * 2 - side_dist), radius, st)
+
+        return mark1 + mark2 + mark3 + mark4
+
+
+class BarBorder(DrawBorder):
+    def __init__(self, width, height):
+        self.w = width
+        self.h = height
+
+    def draw_bar(self, x, y, st):
+        bars = []
+        elem = self._draw_rect_ri(x, y, self.w, self.h, 0, st)
+        bars.append(elem)
+        return bars
 
 
 class SignTool_Border(inkex.EffectExtension):
 
     def add_arguments(self, pars):
+        '''Boilerplate code to handle ui arguments'''
         pars.add_argument("--tab", type=str, dest="active_tab", default="Rectangle")
         pars.add_argument("--width", type=int, dest="width", default="0")
         pars.add_argument("--height", type=int, dest="height", default="0")
@@ -242,105 +208,67 @@ class SignTool_Border(inkex.EffectExtension):
             'stroke_width': self.svg.unittouu(str(so.fStrokeWidth) + 'px'),
             'fill': 'none'}
 
-        if so.active_tab == 'rect': # an extension bug fixed in 1.1
+        if so.active_tab == 'rect': # a system extension bug fixed in 1.1
             self.drawRectBorder()
         elif so.active_tab == 'diamond':
             self.drawDiamondBorder()
         elif so.active_tab == 'bar':
             self.drawBar()
         else:
-            inkex.debug('Please choose other tabs, then apply')
+            self.debug('\n\nPlease choose other tabs, \n'
+                        'Rect tab draws a rect, \n'
+                        'Diamond tab draws a diamond border, \n'
+                        'then click apply')
+
+    def _convert_unit(self, value):
+        return self.svg.unittouu(str(value) + 'in')
+
+    def _set_page_size(self, page_width, page_height):
+        self.svg.set('width', str(page_width) + 'in')
+        self.svg.set('height', str(page_height) + 'in')
+        ratio = self.svg.unittouu('1in')
+        self.svg.set('viewBox', '0 0 ' + str(ratio * page_width) + 
+                        ' ' + str(ratio * page_height))
 
     def drawDiamondBorder(self):
         so = self.options
-        w = so.diamond_width
-        h = w
-        r = so.diamond_radius
-        off = so.diamond_offset
-        bdw = so.diamond_bdwidth
 
-        ra = 25.4
-        svg_elem = self.document.getroot()
+        (w, r, off, bdw) = map(self._convert_unit, (so.diamond_width, so.diamond_radius, 
+                            so.diamond_offset, so.diamond_bdwidth))
 
-        page_width = w * math.cos(math.radians(45)) * 2 + 2
+        page_width = so.diamond_width * math.cos(math.radians(45)) * 2 + 2 
         page_height = page_width
 
-        svg_elem.set('width', str(page_width) + 'in')
-        svg_elem.set('height', str(page_height) + 'in')
-        svg_elem.set('viewBox', '0 0 ' + str(page_width * ra) + ' '
-                     + str(page_height * ra))
+        if so.changeCanvasSize:
 
-        layer_bd = self.createLayer(svg_elem, 'border')
+            self._set_page_size(page_width, page_height)
 
-        style_bd = self.style_stroke
+        border = DiamondBorder(w, r, off, bdw)
+        elems = border.draw_borders(self._convert_unit(page_width) / 2, 
+                                    self._convert_unit(page_height) / 2, self.style_stroke)
 
-        trans_str = 'translate(' + str(page_width / 2 *
-                                       ra) + ',' + str(1 * ra) + ') '
-        trans_str += 'rotate(' + str(45) + ')'
-        trans_mat = simpletransform.parseTransform(trans_str)
+        border_layer = self.find_or_create_layer(self.svg, 'diamond_border')
+        border_layer.add(*elems)
 
-        elm = draw_SVG_rect_ri(0, 0, w * ra, h * ra,
-                               r * ra, style_bd, 'border_outside', layer_bd)
-        simpletransform.applyTransformToNode(trans_mat, elm)
-
-        if off > 0:
-            elm = draw_SVG_rect_ri(off * ra, off * ra,
-                                   (w-2*off) * ra, (h-2*off) * ra,
-                                   (r-off) * ra, style_bd, 'border_offset', layer_bd)
-            simpletransform.applyTransformToNode(trans_mat, elm)
-
-        elm = draw_SVG_rect_ri((off+bdw) * ra, (off+bdw) * ra,
-                               (w - 2*off - 2 * bdw) * ra,
-                               (h - 2*off - 2 * bdw) * ra,
-                               (r - off - bdw) * ra, style_bd, 'border_inside', layer_bd)
-        simpletransform.applyTransformToNode(trans_mat, elm)
-
-        layer_bk = self.createLayer(svg_elem, 'corner_marks')
-
-        if self.options.bDrawMark:
-            draw_diamond_corner_marks(
-                page_width, page_height, ra, style_bd, layer_bk)
-
-    def drawBar(self):
-        so = self.options
-        w = so.bar_width
-        h = so.bar_height
-
-        svg_elem = self.document.getroot()
-        layer_bd = self.findLayer(svg_elem, 'border')
-
-        # place in the middle of drawing
-        ra = 25.4
-        style_bd = self.style_stroke
-
-        page_w = svg_elem.get('width')
-        page_h = svg_elem.get('height')
-        elm = draw_SVG_rect(self.unittouu(page_w) / 2 - (w / 2) * ra,
-                            self.unittouu(page_h) / 2 - (h / 2) * ra,
-                            w * ra, h * ra,
-                            style_bd, 'bar', layer_bd)
-
-
+        if so.bDrawMark:
+            elems = border.draw_corner_marks(self._convert_unit(page_width) / 2, 
+                self._convert_unit(page_height) / 2, self.svg.unittouu('1in'), 
+                self.svg.unittouu('1in'), self.style_stroke)
+            border_marks_layer = self.find_or_create_layer(self.svg, 'border_marks')
+            border_marks_layer.add(*elems)
 
 
     def drawRectBorder(self):
         so = self.options
 
-        w = self.svg.unittouu(str(so.width) + 'in')  # in inches
-        h = self.svg.unittouu(str(so.height) + 'in')
-        r = self.svg.unittouu(str(so.radius) + 'in')
-        off = self.svg.unittouu(str(so.offset) + 'in')
-        bdw = self.svg.unittouu(str(so.bdwidth) + 'in')
+        (w, h, r, off, bdw) = map(self._convert_unit, 
+                    (so.width, so.height, so.radius, so.offset, so.bdwidth))
 
         if so.changeCanvasSize:
             page_width = so.width + 2 
             page_height = so.height + 2
-            self.svg.set('width', str(page_width) + 'in')
-            self.svg.set('height', str(page_height) + 'in')
-            ratio = self.svg.unittouu('1in')
-            self.svg.set('viewBox', '0 0 ' + str(ratio * page_width) + 
-                            ' ' + str(ratio * page_height))
 
+            self._set_page_size(page_width, page_height)            
 
         border = RectBorder(w, h, r, off, bdw)
         elems = border.draw_borders(self.svg.unittouu('1in'), self.svg.unittouu('1in'), 
@@ -349,7 +277,6 @@ class SignTool_Border(inkex.EffectExtension):
         border_layer = self.find_or_create_layer(self.svg, 'border')
         border_layer.add(*elems)
 
-
         if so.bDrawMark:
             elems = border.draw_corner_marks(self.svg.unittouu('1in'), self.svg.unittouu('1in'), 
                 self.svg.unittouu('1in'), self.style_stroke)
@@ -357,6 +284,23 @@ class SignTool_Border(inkex.EffectExtension):
             border_marks_layer.add(*elems)
             
    
+    def drawBar(self):
+        so = self.options
+        (width, height) = map(self._convert_unit, (so.bar_width, so.bar_height) )
+
+        bar = BarBorder(width, height)
+
+        style_bd = self.style_stroke
+
+        page_w = self.svg.unittouu(self.svg.get('width'))
+        page_h = self.svg.unittouu(self.svg.get('height'))
+
+        elems = bar.draw_bar((page_w - width) / 2, 
+                            (page_h - height) / 2, self.style_stroke)
+
+        border_layer = self.find_or_create_layer(self.svg, 'border')
+        border_layer.add(*elems)
+
 
     def find_or_create_layer(self, svg, name):
         # find an existing layer or create a new layer
