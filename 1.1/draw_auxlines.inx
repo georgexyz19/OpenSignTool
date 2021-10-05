@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <_name>2 - Place Alignment Lines</_name>
+  <id>alignlines.com.gotrafficsign</id>
+
+  <param name="dimensions" type="string" _gui-text="Dimensions (inch):">3, 3, 2, 3, 2, 8, 3</param>
+  <param name="type" type="optiongroup" _gui-text="Vertical/Horizontal:">
+    <option value="vertical">Vertical</_item>
+    <option value="horizontal">Horizontal</_item>
+  </param>
+  <param name="fStrokeWidth" type="float" min="0" max="100" precision="1" _gui-text="Stroke Width (pixel):">3.00</param>
+
+  <effect>
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu _name="OpenSignTool"/>
+    </effects-menu>
+  </effect>
+
+  <script>
+    <command reldir="extensions" interpreter="python">draw_auxlines.py</command>
+  </script>
+
+</inkscape-extension>

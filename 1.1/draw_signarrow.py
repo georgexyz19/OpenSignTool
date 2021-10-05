@@ -1,32 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-#  draw_arrow.py
-#  The program to draw arrows shown on 2004 Standard Sign Book P6-2
-#
-#  Copyright June 2018 George Zhang <georgexyz19@gmail.com>
-#  Copyright Sept 2021 George Zhang - updated for Inkscape 1.1
-#
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA 02110-1301, USA.
-#
-#
-from inkex import EffectExtension, TextElement, Style, Path, PathElement, \
-  Transform, Layer, NSS
+
+'''
+draw_arrow.py
+The program to draw arrows shown on 2004 Standard Sign Book P6-2
+
+Copyright June 2018 George Zhang <georgexyz19@gmail.com>
+Copyright Sept 2021 George Zhang - updated for Inkscape 1.1
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+
+'''
+
 
 import math
+
+from inkex import EffectExtension, TextElement, Style, Path, 
+from inkex import PathElement, Transform, Layer, NSS
 
 
 tb = [['2', '2.313', '4.313', '0.313', '0.375'],

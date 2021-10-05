@@ -4,7 +4,8 @@
 # draw_border.py
 Draw the border for the SignTool package
 
-Copyright (C) February 2018, June 2018, February 2020 George Zhang
+Copyright (C) February 2018, June 2018, February 2020 
+Copyright October 2021 George Zhang - updated for Inkscape 1.1
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
