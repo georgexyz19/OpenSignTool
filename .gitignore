@@ -6,3 +6,6 @@ __pycache__/
 .python-version
 venv/
 *.swp
+test_*
+*.svg
+

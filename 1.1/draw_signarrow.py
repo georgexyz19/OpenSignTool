@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 '''
-draw_arrow.py
+draw_signarrow.py
 The program to draw arrows shown on 2004 Standard Sign Book P6-2
 
 Copyright June 2018 George Zhang <georgexyz19@gmail.com>
@@ -28,8 +25,10 @@ MA 02110-1301, USA.
 
 import math
 
-from inkex import EffectExtension, TextElement, Style, Path, 
+from inkex import EffectExtension, TextElement, Style, Path
 from inkex import PathElement, Transform, Layer, NSS
+
+from util import find_or_create_layer
 
 
 tb = [['2', '2.313', '4.313', '0.313', '0.375'],
@@ -66,7 +65,7 @@ class SignTool_Arrow(EffectExtension):
 
     def effect(self):
 
-        layer = self.find_or_create_layer(self.svg, 'arrows')
+        layer = find_or_create_layer(self.svg, 'arrows')
         style = {
             'stroke': '#000000',
             'stroke-width': self.svg.unittouu('1px'),
@@ -96,18 +95,6 @@ class SignTool_Arrow(EffectExtension):
         text.set('style', Style(st))
         parent.append(text)
 
-    def find_or_create_layer(self, svg, name):
-        # find an existing layer or create a new layer
-        # need import inkex at the beginning of the module
-        layer_name = 'Layer %s' % name
-        path = '//svg:g[@inkscape:label="%s"]' % layer_name
-        elements = svg.xpath(path, namespaces=NSS)
-        if elements:
-            layer = elements[0]
-        else:
-            layer = Layer.new(layer_name)
-            self.svg.add(layer)
-        return layer
 
     def draw_SVG_arrow(self, x, y, A, B, C, D, E, st, parent):
 

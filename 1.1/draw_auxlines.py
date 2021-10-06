@@ -1,5 +1,3 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
 """
 # draw_auxlines.py
 Draw the auxilary lines for the SignTool package
@@ -26,12 +24,13 @@ This program create auxilary lines on a new layer.
 '''
 
 
+
+
 import re
 import inkex
 from inkex import NSS, Layer
 from inkex import Vector2d, Line, TextElement
-
-
+from util import find_or_create_layer
 class SignTool_AuxLines(inkex.EffectExtension):
 
     def add_arguments(self, pars):
@@ -49,16 +48,17 @@ class SignTool_AuxLines(inkex.EffectExtension):
         str_input = so.dimensions
         lstr = self.verify_str(str_input)
 
-        alignment_layer = self.find_or_create_layer(self.svg, 'align_lines')
+        alignment_layer = find_or_create_layer(self.svg, 'align_lines')
         elems = self.draw_alignment_lines(
             lstr, so.line_direction, so.stroke_width)
         alignment_layer.add(*elems)
 
     def verify_str(self, str_input):
-        strlist_re = []
         str_r = str_input.replace(';', ',')
-        str_r = str_input.replace(':', ',')
-        str_remove = re.sub(r'[^\d\s,.]', '', str_r)  # remove char
+        str_r = str_r.replace(':', ',')
+
+        # only digits, spaces, ',' and '.' not sub'ed
+        str_remove = re.sub(r'[^\d\s,.]', '', str_r)
         str_l = str_remove.split(',')
         strlist = [s.strip() for s in str_l]
         return strlist
@@ -132,19 +132,6 @@ class SignTool_AuxLines(inkex.EffectExtension):
         el = Line.new(start=(v1.x, v1.y), end=(v2.x, v2.y))
         el.style = st
         return el
-
-    def find_or_create_layer(self, svg, name):
-        # find an existing layer or create a new layer
-        # need import inkex at the beginning of the module
-        layer_name = 'Layer %s' % name
-        path = '//svg:g[@inkscape:label="%s"]' % layer_name
-        elements = svg.xpath(path, namespaces=NSS)
-        if elements:
-            layer = elements[0]
-        else:
-            layer = Layer.new(layer_name)
-            self.svg.add(layer)
-        return layer
 
 
 if __name__ == '__main__':

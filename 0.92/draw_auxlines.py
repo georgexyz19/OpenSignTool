@@ -58,8 +58,10 @@ class SignTool_AuxLines(inkex.Effect):
   def verify_str(self, str_input):    
     strlist_re = []
     str_r = str_input.replace(';', ',')
-    str_r = str_input.replace(':', ',')
-    str_remove = re.sub(r'[^\d\s,.]', '', str_r) # remove char
+    str_r = str_r.replace(':', ',')    # fix an error while doing version 1.1
+
+    # only digits, spaces, ',' and '.' not sub'ed
+    str_remove = re.sub(r'[^\d\s,.]', '', str_r) 
     str_l = str_remove.split(',')  
     for s in str_l:
       strlist_re.append(s.strip())

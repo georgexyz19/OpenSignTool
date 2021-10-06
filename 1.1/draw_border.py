@@ -1,5 +1,3 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
 """
 # draw_border.py
 Draw the border for the SignTool package
@@ -30,6 +28,7 @@ import inkex
 from inkex import Rectangle, Layer, NSS
 from inkex import Circle, Line, Vector2d
 from inkex import Transform
+from util import find_or_create_layer
 
 class DrawBorder(object):
     """"contains drawing methods for both rect, diamond, and bar"""
@@ -248,14 +247,14 @@ class SignTool_Border(inkex.EffectExtension):
         elems = border.draw_borders(self._convert_unit(page_width) / 2, 
                                     self._convert_unit(page_height) / 2, self.style_stroke)
 
-        border_layer = self.find_or_create_layer(self.svg, 'diamond_border')
+        border_layer = find_or_create_layer(self.svg, 'diamond_border')
         border_layer.add(*elems)
 
         if so.bDrawMark:
             elems = border.draw_corner_marks(self._convert_unit(page_width) / 2, 
                 self._convert_unit(page_height) / 2, self.svg.unittouu('1in'), 
                 self.svg.unittouu('1in'), self.style_stroke)
-            border_marks_layer = self.find_or_create_layer(self.svg, 'border_marks')
+            border_marks_layer = find_or_create_layer(self.svg, 'border_marks')
             border_marks_layer.add(*elems)
 
 
@@ -275,13 +274,13 @@ class SignTool_Border(inkex.EffectExtension):
         elems = border.draw_borders(self.svg.unittouu('1in'), self.svg.unittouu('1in'), 
             self.style_stroke)
 
-        border_layer = self.find_or_create_layer(self.svg, 'border')
+        border_layer = find_or_create_layer(self.svg, 'border')
         border_layer.add(*elems)
 
         if so.bDrawMark:
             elems = border.draw_corner_marks(self.svg.unittouu('1in'), self.svg.unittouu('1in'), 
                 self.svg.unittouu('1in'), self.style_stroke)
-            border_marks_layer = self.find_or_create_layer(self.svg, 'border_marks')
+            border_marks_layer = find_or_create_layer(self.svg, 'border_marks')
             border_marks_layer.add(*elems)
             
    
@@ -299,22 +298,8 @@ class SignTool_Border(inkex.EffectExtension):
         elems = bar.draw_bar((page_w - width) / 2, 
                             (page_h - height) / 2, self.style_stroke)
 
-        border_layer = self.find_or_create_layer(self.svg, 'border')
+        border_layer = find_or_create_layer(self.svg, 'border')
         border_layer.add(*elems)
-
-
-    def find_or_create_layer(self, svg, name):
-        # find an existing layer or create a new layer
-        # need import inkex at the beginning of the module
-        layer_name = 'Layer %s' % name
-        path = '//svg:g[@inkscape:label="%s"]' % layer_name
-        elements = svg.xpath(path, namespaces=NSS)
-        if elements:
-            layer = elements[0]
-        else:
-            layer = Layer.new(layer_name)
-            self.svg.add(layer)
-        return layer
 
 
 if __name__ == '__main__':
