@@ -20,17 +20,29 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+
+
 import inkex
-import simplestyle
-import os
-import simpletransform
 import copy
 from place_message_tb import *
 import re
 import gzip
 
-from lxml import etree
-inkex.etree = etree
+from inkex import Rectangle
+from inkex import Group, addNS
+from inkex import Transform, Style
+
+from opensigntool_util import find_or_create_layer
+from inkex.elements._base import load_svg
+
+import logging
+logging.basicConfig(filename='/home/george/Desktop/new-logging.txt', 
+    filemode='w', format='%(levelname)s: %(message)s', level=logging.DEBUG)
+
+
+
+# import simpletransform
+# import simplestyle
 
 
 def table(s):
@@ -63,6 +75,23 @@ def downtb(s):
         return downtb_EM
 
 
+class LoadLetter(inkex.InputExtension):
+
+    def __init__(self, str_etree=None):
+        super().__init__()
+        self.document = self.load(str_etree)
+
+    def load(self, stream):
+        """Load the stream as an svg xml etree"""
+        document = load_svg(stream)
+        self.svg = document.getroot()
+        return document
+
+    def effect(self):
+        """Effect isn't needed for a lot of Input extensions"""
+        return NotImplemented('effect method should not be called')
+
+
 class SignTool_Message(inkex.EffectExtension):
     # def __init__(self):
         # inkex.Effect.__init__(self)
@@ -79,83 +108,112 @@ class SignTool_Message(inkex.EffectExtension):
         # self.OptionParser.add_option("--bDrawBox", action="store",
         #                              type="inkbool", dest="bDrawBox", default=False)
 
+    def __init__(self):
+        super().__init__()
 
+        # load sign_letters 
+
+        # very basic protection agaist people messing with letter
+        with gzip.open('sign_letters', 'rb') as f:
+            str_etree = f.read()
+
+        letter = LoadLetter(str_etree)
+        # letter.add_arguments()
+        # letter.load(str_etree)
+
+        self.letter_svg = letter.svg
+
+        # svg = letter.svg     
+        # for e in svg.getiterator():
+        #     # out id info
+        #     attr = e.attrib
+        #     idattr = attr.get('id', 'none')
+        #     # logging.debug(f'e.id is { idattr }') ## now I can load a letter
+        #     # logging.debug(f'e.id is { idattr }') ## now I can load a letter
+
+        # elem = letter.svg.getElementById('E66')
+        # logging.debug(f'{elem}')
+
+        # logging.debug(f'{elem.bounding_box()}')
+
+        # # groot, gidmap = inkex.etree.XMLID(str_etree)
+        # # self.groot = groot
+        # # self.gidmap = gidmap
 
 
     def add_arguments(self, pars):
       
         pars.add_argument('--message', type=str, dest='message', default='0')
-        pars.add_argument('--fontsize', type=str, dest='fontsize', default='4')
+        pars.add_argument('--fontsize', type=str, dest='fontsize', default='0')
         pars.add_argument('--fontheight', type=float, dest='fontheight', default='0')
         pars.add_argument('--dist_to_top', type=float, dest='dist_to_top', default='0')
         pars.add_argument('--bdraw_box', type=inkex.Boolean, dest='bdraw_box', default=False)
 
 
-        with gzip.open('sign_letters', 'rb') as f:
-            str_etree = f.read()
-
-        groot, gidmap = inkex.etree.XMLID(str_etree)
-        self.groot = groot
-        self.gidmap = gidmap
-
-
     def effect(self):
+
         so = self.options
 
-        self.unittouu = self.svg.unittouu
+        logging.debug(f'so is {so}')
 
-        fontheight = self.unittouu(str(so.fontheight)+'in')
+        # self.unittouu = self.svg.unittouu
+
+        fontheight = self.svg.unittouu(str(so.fontheight)+'in')
         message = so.message
-        fontsize = so.fontsize
-        dist_to_top = self.unittouu(str(so.dist_to_top + 1)+'in')
+        fontsize = so.fontsize  # et 'E'
+        dist_to_top = self.svg.unittouu(str(so.dist_to_top + 1)+'in')
         self.fontsize = fontsize  # this needs to be dealt with
 
-        layer = self.create_layer(self.document.getroot(), 'messages')
+        layer = find_or_create_layer(self.svg, 'messages')
         group = self.create_group(layer, message)  # group at center of page
+        layer.add(group)
 
         msg_width = self.message_width(message, fontsize, fontheight)
-        doc_width = self.unittouu(self.getDocumentWidth())
+        doc_width = self.svg.width # unittouu(self.getDocumentWidth())
+
+        logging.debug(f'msg widht is {msg_width}')
+        logging.debug(f'doc width is {doc_width}')
+
+
         self.draw_message(message, fontsize, fontheight, doc_width / 2 -
                           msg_width / 2, dist_to_top, group)
 
-    def create_layer(self, parent, layer_name):
-        path = '//svg:g[@inkscape:label="%s"]' % layer_name
-        el_list = self.document.xpath(path, namespaces=inkex.NSS)
-        if el_list:
-            layer = el_list[0]
-        else:
-            layer = inkex.etree.SubElement(parent, 'g')
-            layer.set(inkex.addNS('label', 'inkscape'), layer_name)
-            layer.set(inkex.addNS('groupmode', 'inkscape'), 'layer')
-        return layer
 
     def create_group(self, parent, group_name):
-        group = inkex.etree.SubElement(parent, 'g')
-        group.set(inkex.addNS('label', 'inkscape'), group_name)
-        group.set('fill', 'none')
+        group = Group()
+        group.set(addNS('label', 'inkscape'), group_name)
         return group
+
+
+
 
     # return an element of a character
     def get_char(self, letter):
         if letter == 'cent':
             id = self.fontsize + 'cent'
-            elem = self.gidmap[id]
+            elem = self.letter_svg.getElementById(id)               # self.gidmap[id]
             return elem
         else:
             code = ord(letter)
             id = self.fontsize + str(code)
-            elem = self.gidmap[id]
+            elem = self.letter_svg.getElementById(id)         #self.gidmap[id]
             return elem
 
-    def get_box(self, elem):
+
+
+
+    def get_box(self, elem, transform=None):
         #elem = self.get_char(letter)
-        bbox = simpletransform.computeBBox([elem])
-        return bbox
+        bbox = elem.bounding_box(transform=transform)
+        return (bbox.left, bbox.right, bbox.top, bbox.bottom )
+
+
 
     def remove_id(self, d, key):
         if key in d:
             del d[key]
         return d
+
 
     # is upper case or is a number, those align vertical center
     # or is one of the eleven characters &!#()@?$-=+
@@ -164,6 +222,7 @@ class SignTool_Message(inkex.EffectExtension):
             return True
         else:
             return False
+
 
     def parse_message(self, message):
         if not message:
@@ -203,6 +262,9 @@ class SignTool_Message(inkex.EffectExtension):
 
             i = i + 1
         return message_list
+
+
+
 
     def draw_message(self, message, fontsize, fontheight, xleft_in, ytop_in, parent):
         msg_list = self.parse_message(message)
@@ -266,6 +328,7 @@ class SignTool_Message(inkex.EffectExtension):
 
             i = i + 1
 
+
     def message_width(self, message, fontsize, fontheight):
         msg_list = self.parse_message(message)
 
@@ -328,6 +391,8 @@ class SignTool_Message(inkex.EffectExtension):
         width = xleft - le_right
         return width
 
+
+
     def fraction_width(self, message, fontsize, fontheight):
 
         space_ratio = {'B': 0.65, 'C': 0.75, 'D': 0.85,
@@ -339,6 +404,8 @@ class SignTool_Message(inkex.EffectExtension):
             whole_width = fontheight * 1.5 * 8 / 6
 
         return whole_width
+
+
 
     # draw fractions, message in the format of 1/2 2/3
     # width is 7/6 of height
@@ -374,12 +441,22 @@ class SignTool_Message(inkex.EffectExtension):
         self.draw_letter(message[2], fontsize,
                          fontheight, xleft_d, ytop_d, parent)
 
+
+
+
     def distance_width(self, distance, fontsize, fontheight, prev_letter, next_letter):
         d_width = self.unittouu(distance + 'in')
         prev_letter_r = self.letter_size(prev_letter, fontsize, fontheight)[2]
         next_letter_l = self.letter_size(next_letter, fontsize, fontheight)[0]
         d_width = d_width - prev_letter_r - next_letter_l
         return d_width
+
+
+
+
+
+
+
 
     # do not support 2 spaces together
     def space_width(self, fontsize, fontheight, prev_letter, next_letter):
@@ -391,6 +468,9 @@ class SignTool_Message(inkex.EffectExtension):
         space_w = space_width - prev_letter_r - next_letter_l
         return space_w
 
+
+
+
     # letter size in the table (assume 4 inch letter) font size ABCD
     def letter_size(self, letter, fontsize, fontheight):
         ratio = fontheight * 1/4  # table values are in 4 inch letter height
@@ -399,15 +479,22 @@ class SignTool_Message(inkex.EffectExtension):
         right = table(fontsize)[letter][2] * ratio
         return (left, w_letter, right)
 
+
+
     # ytop is top of the letter to top sign edge
     def draw_letter(self, letter, fontsize, fontheight, xleft, ytop, parent):
 
         elem = copy.deepcopy(self.get_char(letter))
 
-        new_id = self.uniqueId(elem.attrib['id'])
+        new_id = self.svg.get_unique_id(prefix='id')   # self.uniqueId(elem.attrib['id'])
+
+        # new_id = self.uniqueId(elem.attrib['id'])
         elem.attrib['id'] = new_id
 
         bbox = self.get_box(elem)  # returns xmin, xmax, ymin, and ymax
+
+        logging.debug(f'bbox is {bbox}')
+
         l_width = bbox[1] - bbox[0]
         l_height = bbox[3] - bbox[2]
 
@@ -416,20 +503,31 @@ class SignTool_Message(inkex.EffectExtension):
         right = self.letter_size(letter, fontsize, fontheight)[2]
 
         # xleft, ytop, w_letter, fontheight is the box size
-        if self.options.bDrawBox:
-            style_rect = {
-                'stroke_color': '#000000',
-                'stroke_width': self.unittouu('3px'),
-                'fill': 'none'}
-            self.draw_SVG_rect(xleft, ytop, w_letter,
-                               fontheight, style_rect, letter, parent)
+        logging.debug(f'bdraw_box is {self.options.bdraw_box}')
 
+        if self.options.bdraw_box:
+
+            st = {
+            'stroke': '#000000',
+            'stroke-width': self.svg.unittouu('3px'),
+            'fill': 'none'}
+
+            e1 = self._draw_rect(xleft, ytop, w_letter,
+                               fontheight, st, letter)
+            parent.add(e1)  ## added
+ 
         l_ratio = w_letter / l_width
+
+
+        logging.debug(f'l_ratio is {l_ratio}')  ###
 
         # scale elem to fontheight inch size
         t1 = 'scale(' + str(l_ratio) + ')'
-        m1 = simpletransform.parseTransform(t1)
-        simpletransform.applyTransformToNode(m1, elem)
+
+        trans1 = Transform(t1)
+
+        # m1 = simpletransform.parseTransform(t1)
+        # simpletransform.applyTransformToNode(m1, elem)
 
         if letter in 'gjpqy",*abcdeosuQ':   # one of the eight characters has down
             down = downtb(fontsize)[letter]
@@ -437,7 +535,11 @@ class SignTool_Message(inkex.EffectExtension):
             down = 0
         down = down * fontheight / 2  # down units is in 2 inch letters
 
-        bbox = self.get_box(elem)
+        bbox = self.get_box(elem, trans1)  ## apply to elem 
+
+        logging.debug(f'bbox is {bbox}')
+
+
         if not self.is_align_center(letter):  # lowcase align bottom
             t2 = 'translate(' + \
                 str(xleft + w_letter / 2 - (bbox[0] + bbox[1])/2) + ',' + \
@@ -447,24 +549,25 @@ class SignTool_Message(inkex.EffectExtension):
                 str(xleft + w_letter / 2 - (bbox[0] + bbox[1])/2) + ',' + \
                 str(ytop + fontheight/2 - (bbox[2] + bbox[3])/2 + down) + ')'
 
-        m2 = simpletransform.parseTransform(t2)
-        simpletransform.applyTransformToNode(m2, elem)
+        trans2 = Transform(t2)
+        elem.transform = trans2 * trans1    # this is quite tricky  
+        # m2 = simpletransform.parseTransform(t2)
+        # simpletransform.applyTransformToNode(m2, elem)
 
         parent.append(elem)
 
-    def draw_SVG_rect(self, x, y, width, height, style, name, parent):
-        line_style = {'stroke': style['stroke_color'],
-                      'stroke-width': str(style['stroke_width']),
-                      'fill': style['fill']}
-        rect_attribs = {'style': simplestyle.formatStyle(line_style),
-                        'width': str(width),
-                        'height': str(height),
-                        'x': str(x), 'y': str(y),
-                        inkex.addNS('label', 'inkscape'): name}
-        inkex.etree.SubElement(
-            parent, inkex.addNS('rect', 'svg'), rect_attribs)
+
+
+    def _draw_rect(self, x, y, width, height, st, name):
+        el = Rectangle.new(x, y, width, height)
+        el.style = st
+        el.set(addNS('label', 'inkscape'), name)
+        return el
+
 
 
 if __name__ == '__main__':
     e = SignTool_Message()
     e.run()
+
+

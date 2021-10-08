@@ -24,13 +24,13 @@ This program create auxilary lines on a new layer.
 '''
 
 
-
-
 import re
 import inkex
 from inkex import NSS, Layer
 from inkex import Vector2d, Line, TextElement
-from util import find_or_create_layer
+from opensigntool_util import find_or_create_layer
+
+
 class SignTool_AuxLines(inkex.EffectExtension):
 
     def add_arguments(self, pars):

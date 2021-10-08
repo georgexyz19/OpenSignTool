@@ -28,7 +28,7 @@ import inkex
 from inkex import Rectangle, Layer, NSS
 from inkex import Circle, Line, Vector2d
 from inkex import Transform
-from util import find_or_create_layer
+from opensigntool_util import find_or_create_layer
 
 class DrawBorder(object):
     """"contains drawing methods for both rect, diamond, and bar"""

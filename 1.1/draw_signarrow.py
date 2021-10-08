@@ -26,9 +26,9 @@ MA 02110-1301, USA.
 import math
 
 from inkex import EffectExtension, TextElement, Style, Path
-from inkex import PathElement, Transform, Layer, NSS
+from inkex import PathElement, Transform, Layer
 
-from util import find_or_create_layer
+from opensigntool_util import find_or_create_layer
 
 
 tb = [['2', '2.313', '4.313', '0.313', '0.375'],
