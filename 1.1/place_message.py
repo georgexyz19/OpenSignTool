@@ -35,9 +35,9 @@ from inkex import Transform, Style
 from opensigntool_util import find_or_create_layer
 from inkex.elements._base import load_svg
 
-import logging
-logging.basicConfig(filename='/home/george/Desktop/new-logging.txt', 
-    filemode='w', format='%(levelname)s: %(message)s', level=logging.DEBUG)
+# import logging
+# logging.basicConfig(filename='/home/george/Desktop/new-logging.txt', 
+#     filemode='w', format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
 
 
@@ -154,7 +154,7 @@ class SignTool_Message(inkex.EffectExtension):
 
         so = self.options
 
-        logging.debug(f'so is {so}')
+        # logging.debug(f'so is {so}')
 
         # self.unittouu = self.svg.unittouu
 
@@ -171,8 +171,8 @@ class SignTool_Message(inkex.EffectExtension):
         msg_width = self.message_width(message, fontsize, fontheight)
         doc_width = self.svg.width # unittouu(self.getDocumentWidth())
 
-        logging.debug(f'msg widht is {msg_width}')
-        logging.debug(f'doc width is {doc_width}')
+        # logging.debug(f'msg widht is {msg_width}')
+        # logging.debug(f'doc width is {doc_width}')
 
 
         self.draw_message(message, fontsize, fontheight, doc_width / 2 -
@@ -493,7 +493,7 @@ class SignTool_Message(inkex.EffectExtension):
 
         bbox = self.get_box(elem)  # returns xmin, xmax, ymin, and ymax
 
-        logging.debug(f'bbox is {bbox}')
+        # logging.debug(f'bbox is {bbox}')
 
         l_width = bbox[1] - bbox[0]
         l_height = bbox[3] - bbox[2]
@@ -503,7 +503,7 @@ class SignTool_Message(inkex.EffectExtension):
         right = self.letter_size(letter, fontsize, fontheight)[2]
 
         # xleft, ytop, w_letter, fontheight is the box size
-        logging.debug(f'bdraw_box is {self.options.bdraw_box}')
+        # logging.debug(f'bdraw_box is {self.options.bdraw_box}')
 
         if self.options.bdraw_box:
 
@@ -519,7 +519,7 @@ class SignTool_Message(inkex.EffectExtension):
         l_ratio = w_letter / l_width
 
 
-        logging.debug(f'l_ratio is {l_ratio}')  ###
+        # logging.debug(f'l_ratio is {l_ratio}')  ###
 
         # scale elem to fontheight inch size
         t1 = 'scale(' + str(l_ratio) + ')'
@@ -537,7 +537,7 @@ class SignTool_Message(inkex.EffectExtension):
 
         bbox = self.get_box(elem, trans1)  ## apply to elem 
 
-        logging.debug(f'bbox is {bbox}')
+        # logging.debug(f'bbox is {bbox}')
 
 
         if not self.is_align_center(letter):  # lowcase align bottom
