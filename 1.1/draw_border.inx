@@ -23,7 +23,7 @@
     </page>
     <page name="options" _gui-text="Options">
       <param name="changeCanvasSize" type="boolean" _gui-text="Change Canvas Size">true</param>
-      <param name="bDrawMark" type="boolean" _gui-text="Place drawing marks">false</param>
+      <param name="bDrawMark" type="boolean" _gui-text="Place Drawing Marks">false</param>
       <param name="fStrokeWidth" type="float" min="0" max="100" precision="2" _gui-text="Stroke Width (mm):">3.00</param>
     </page>
   </param>

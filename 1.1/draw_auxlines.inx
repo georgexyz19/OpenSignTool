@@ -5,8 +5,8 @@
 
   <param name="dimensions" type="string" _gui-text="Dimensions (inch):">3, 3, 2, 3, 2, 8, 3</param>
   <param name="type" type="optiongroup" _gui-text="Vertical/Horizontal:">
-    <option value="vertical">Vertical</_item>
-    <option value="horizontal">Horizontal</_item>
+    <option value="vertical">Vertical</option>
+    <option value="horizontal">Horizontal</option>
   </param>
   <param name="fStrokeWidth" type="float" min="0" max="100" precision="1" _gui-text="Stroke Width (pixel):">3.00</param>
 
