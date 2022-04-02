@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 
-
 import inkex
 import copy
 from place_message_tb import *
@@ -92,7 +91,7 @@ class LoadLetter(inkex.InputExtension):
         return NotImplemented('effect method should not be called')
 
 
-class SignTool_Message(inkex.EffectExtension):
+class SignToolMessage(inkex.EffectExtension):
     # def __init__(self):
         # inkex.Effect.__init__(self)
 
@@ -140,7 +139,6 @@ class SignTool_Message(inkex.EffectExtension):
         # # self.groot = groot
         # # self.gidmap = gidmap
 
-
     def add_arguments(self, pars):
       
         pars.add_argument('--message', type=str, dest='message', default='0')
@@ -153,9 +151,7 @@ class SignTool_Message(inkex.EffectExtension):
     def effect(self):
 
         so = self.options
-
         # logging.debug(f'so is {so}')
-
         # self.unittouu = self.svg.unittouu
 
         fontheight = self.svg.unittouu(str(so.fontheight)+'in')
@@ -178,14 +174,10 @@ class SignTool_Message(inkex.EffectExtension):
         self.draw_message(message, fontsize, fontheight, doc_width / 2 -
                           msg_width / 2, dist_to_top, group)
 
-
     def create_group(self, parent, group_name):
         group = Group()
         group.set(addNS('label', 'inkscape'), group_name)
         return group
-
-
-
 
     # return an element of a character
     def get_char(self, letter):
@@ -199,21 +191,15 @@ class SignTool_Message(inkex.EffectExtension):
             elem = self.letter_svg.getElementById(id)         #self.gidmap[id]
             return elem
 
-
-
-
     def get_box(self, elem, transform=None):
         #elem = self.get_char(letter)
         bbox = elem.bounding_box(transform=transform)
         return (bbox.left, bbox.right, bbox.top, bbox.bottom )
 
-
-
     def remove_id(self, d, key):
         if key in d:
             del d[key]
         return d
-
 
     # is upper case or is a number, those align vertical center
     # or is one of the eleven characters &!#()@?$-=+
@@ -222,7 +208,6 @@ class SignTool_Message(inkex.EffectExtension):
             return True
         else:
             return False
-
 
     def parse_message(self, message):
         if not message:
@@ -262,9 +247,6 @@ class SignTool_Message(inkex.EffectExtension):
 
             i = i + 1
         return message_list
-
-
-
 
     def draw_message(self, message, fontsize, fontheight, xleft_in, ytop_in, parent):
         msg_list = self.parse_message(message)
@@ -328,7 +310,6 @@ class SignTool_Message(inkex.EffectExtension):
 
             i = i + 1
 
-
     def message_width(self, message, fontsize, fontheight):
         msg_list = self.parse_message(message)
 
@@ -391,8 +372,6 @@ class SignTool_Message(inkex.EffectExtension):
         width = xleft - le_right
         return width
 
-
-
     def fraction_width(self, message, fontsize, fontheight):
 
         space_ratio = {'B': 0.65, 'C': 0.75, 'D': 0.85,
@@ -404,8 +383,6 @@ class SignTool_Message(inkex.EffectExtension):
             whole_width = fontheight * 1.5 * 8 / 6
 
         return whole_width
-
-
 
     # draw fractions, message in the format of 1/2 2/3
     # width is 7/6 of height
@@ -442,21 +419,12 @@ class SignTool_Message(inkex.EffectExtension):
                          fontheight, xleft_d, ytop_d, parent)
 
 
-
-
     def distance_width(self, distance, fontsize, fontheight, prev_letter, next_letter):
         d_width = self.unittouu(distance + 'in')
         prev_letter_r = self.letter_size(prev_letter, fontsize, fontheight)[2]
         next_letter_l = self.letter_size(next_letter, fontsize, fontheight)[0]
         d_width = d_width - prev_letter_r - next_letter_l
         return d_width
-
-
-
-
-
-
-
 
     # do not support 2 spaces together
     def space_width(self, fontsize, fontheight, prev_letter, next_letter):
@@ -468,9 +436,6 @@ class SignTool_Message(inkex.EffectExtension):
         space_w = space_width - prev_letter_r - next_letter_l
         return space_w
 
-
-
-
     # letter size in the table (assume 4 inch letter) font size ABCD
     def letter_size(self, letter, fontsize, fontheight):
         ratio = fontheight * 1/4  # table values are in 4 inch letter height
@@ -478,8 +443,6 @@ class SignTool_Message(inkex.EffectExtension):
         w_letter = table(fontsize)[letter][1] * ratio
         right = table(fontsize)[letter][2] * ratio
         return (left, w_letter, right)
-
-
 
     # ytop is top of the letter to top sign edge
     def draw_letter(self, letter, fontsize, fontheight, xleft, ytop, parent):
@@ -518,7 +481,6 @@ class SignTool_Message(inkex.EffectExtension):
  
         l_ratio = w_letter / l_width
 
-
         # logging.debug(f'l_ratio is {l_ratio}')  ###
 
         # scale elem to fontheight inch size
@@ -556,8 +518,6 @@ class SignTool_Message(inkex.EffectExtension):
 
         parent.append(elem)
 
-
-
     def _draw_rect(self, x, y, width, height, st, name):
         el = Rectangle.new(x, y, width, height)
         el.style = st
@@ -565,9 +525,8 @@ class SignTool_Message(inkex.EffectExtension):
         return el
 
 
-
 if __name__ == '__main__':
-    e = SignTool_Message()
+    e = SignToolMessage()
     e.run()
 
 
